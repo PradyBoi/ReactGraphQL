@@ -2,25 +2,35 @@ import React, { useState, Fragment } from "react";
 
 import TodoItem from "./TodoItem";
 import TodoFilters from "./TodoFilters";
+import gql from "graphql-tag";
+import { Query } from "react-apollo";
+import { render } from "react-dom";
+
+////////////////////////////////////////////////////
+// Needs to be deleted
+import { ApolloProvider } from "react-apollo";
+import ApolloClient from 'apollo-client';
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { HttpLink } from "apollo-link-http";
+////////////////////////////////////////////////////
+
+
+
+const GET_MY_TODOS = gql`query getMyTodos{
+  todos(where: {is_public: {_eq: false}}, order_by: {created_at: desc}){
+    id
+    title 
+    created_at
+    is_completed
+  }
+}`;
+
+console.log(GET_MY_TODOS);
 
 const TodoPrivateList = props => {
   const [state, setState] = useState({
     filter: "all",
     clearInProgress: false,
-    todos: [
-      {
-        id: "1",
-        title: "This is private todo 1",
-        is_completed: true,
-        is_public: false
-      },
-      {
-        id: "2",
-        title: "This is private todo 2",
-        is_completed: false,
-        is_public: false
-      }
-    ]
   });
 
   const filterResults = filter => {
@@ -29,14 +39,15 @@ const TodoPrivateList = props => {
       filter: filter
     });
   };
-
+  
   const clearCompleted = () => {};
-
-  let filteredTodos = state.todos;
+  
+  const { todos } = this.props;
+  let filteredTodos = todos;
   if (state.filter === "active") {
-    filteredTodos = state.todos.filter(todo => todo.is_completed !== true);
+    filteredTodos = todos.filter(todo => todo.is_completed !== true);
   } else if (state.filter === "completed") {
-    filteredTodos = state.todos.filter(todo => todo.is_completed === true);
+    filteredTodos = todos.filter(todo => todo.is_completed === true);
   }
 
   const todoList = [];
@@ -61,4 +72,36 @@ const TodoPrivateList = props => {
   );
 };
 
-export default TodoPrivateList;
+////////////////////////
+// Needs to be deleted
+const createApolloClient = (authToken) => {
+  return new ApolloClient({
+    link: new HttpLink({
+      url: 'https://hasura.io/learn/graphql/graphiql',
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    }),
+    cache: new InMemoryCache()
+  })
+};
+const client = createApolloClient(true);
+////////////////////////////////
+
+const TodoPrivateListQuery = () =>{
+  return (
+    <Query query={GET_MY_TODOS}>
+      {({loading, error, data}) => {
+        if(loading){
+          return <div>Loading...</div>
+        }
+        if(error){
+          return <div>Error...</div>
+        }
+        return <TodoPrivateList client={client} todos={data.todos} />
+      }}
+    </Query>
+  )
+}
+
+export default TodoPrivateListQuery;

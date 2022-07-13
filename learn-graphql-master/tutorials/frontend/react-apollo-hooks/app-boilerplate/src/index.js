@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom";
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+// import { Route, Router } from "react-router-dom";
 
 import { createBrowserHistory } from "history";
 import Auth0ProviderWithHistory from "./components/Auth/auth0-provider-with-history";
@@ -10,7 +11,7 @@ import "./styles/App.css";
 
 export const history = createBrowserHistory();
 
-console.log(history);
+// console.log(history);
 
 ReactDOM.render(
   <React.StrictMode>

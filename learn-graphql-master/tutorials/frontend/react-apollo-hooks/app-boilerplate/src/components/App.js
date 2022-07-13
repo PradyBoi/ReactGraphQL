@@ -9,8 +9,6 @@ import OnlineUsersWrapper from "./OnlineUsers/OnlineUsersWrapper";
 
 import useAccessToken from "../hooks/useAccessToken";
 
-// import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-// import { ApolloLink } from '@apollo/client';
 
 
 import ApolloClient from 'apollo-client';
@@ -22,21 +20,19 @@ import { ApolloProvider } from "react-apollo";
 const createApolloClient = (authToken) => {
   return new ApolloClient({
     link: new HttpLink({
-      url: 'https://learn.hasura.io/graphql',
+      url: 'https://hasura.io/learn/graphql/graphiql',
       headers: {
-        Authorization: `Bearer ${authToken}}`
+        Authorization: `Bearer ${authToken}`
       }
     }),
     cache: new InMemoryCache()
   })
 };
 
-
-
 const App = ({ auth }) => {
   const idToken = useAccessToken();
-  const client = createApolloClient(auth.idToken);
-  console.log(idToken);
+  const client = createApolloClient(true);
+  console.log(auth);
   const { loading, logout } = useAuth0();
 
   if (loading) {
@@ -69,5 +65,7 @@ const App = ({ auth }) => {
     </ApolloProvider>
   );
 };
+
+console.log(ApolloProvider);
 
 export default App;
